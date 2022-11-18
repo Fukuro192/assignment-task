@@ -14,10 +14,49 @@
 <body>
 
 
-<div class="container content pt-5">
-  --- your code here ---
+<div class="container content pt-5" id="table">
+
 </div>
 
+<script>
+  fetch('/api/v1/weather')
+  .then(res => res.json())
+  .then(weather => {
+    let items = weather.weather;
+
+    let headers = ['City', 'Temperature'];
+    let table = document.createElement('table');
+    table.className = 'table table-striped';
+    let thead = document.createElement('thead');
+    thead.className = 'thead-dark';
+    table.appendChild(thead);
+    let headerRow = document.createElement('tr');
+    headers.forEach(headerText => {
+      let header = document.createElement('th');
+      let textNode = document.createTextNode(headerText);
+      header.appendChild(textNode);
+      headerRow.appendChild(header);
+    });
+    thead.appendChild(headerRow);
+
+    let tbody = document.createElement('tbody');
+    for( item of items ) {
+      let row = document.createElement('tr');
+      for( value of Object.values(item) ) {
+        let cell = document.createElement('td');
+        let textNode = document.createTextNode(value);
+        cell.appendChild(textNode);
+        row.appendChild(cell);
+      }
+      tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+
+    let div = document.getElementById('table');
+    div.appendChild(table);
+  });
+
+</script>
 
 <!-- Including Bootstrap JS (with its jQuery dependency) so that dynamic components work -->
 <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
