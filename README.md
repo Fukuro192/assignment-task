@@ -1,6 +1,6 @@
 # assignment-task
 
-A small project for an assigment passed through an interview.
+A small project for an assignment passed through an interview.
 
 ## setting up the project
 
