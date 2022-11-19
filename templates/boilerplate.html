@@ -15,15 +15,17 @@
 
 
 <div class="container content pt-5" id="table">
-
+  <div class="form-group row">
+    <label for="staticEmail" class="col-sm-2 col-form-label">Search for a City: </label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" placeholder="for example: Cologne" id="searchbar">
+    </div>
+  </div>
+  
 </div>
 
 <script>
-  fetch('/api/v1/weather')
-  .then(res => res.json())
-  .then(weather => {
-    let items = weather.weather;
-
+  function updateTable(items){
     let headers = ['City', 'Temperature'];
     let table = document.createElement('table');
     table.className = 'table table-striped';
@@ -53,7 +55,29 @@
     table.appendChild(tbody);
 
     let div = document.getElementById('table');
+    let tables = div.getElementsByTagName('table');
+    for( oldTable of tables ) {
+      oldTable.remove()
+    }
     div.appendChild(table);
+  }
+
+  fetch('/api/v1/weather')
+  .then(res => res.json())
+  .then(weather => {
+    let items = weather.weather;
+    updateTable(items);
+  });
+
+  let searchbar = document.getElementById('searchbar');
+  searchbar.addEventListener('keypress', () => {
+    console.log(searchbar.value);
+    fetch('/api/v1/weather?city=' + searchbar.value)
+    .then(res => res.json())
+    .then(weather => {
+      let items = weather.weather;
+      updateTable(items);
+    });
   });
 
 </script>
