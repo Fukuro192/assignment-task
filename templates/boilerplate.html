@@ -1,89 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>{{title}}</title>
 
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.1/css/fontawesome.min.css">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <!-- bootstrap icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+  <!-- custom styling -->
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
 
-<div class="container content pt-5" id="table">
+<div class="container content pt-5 fs-5" id="div-content">
+  
   <div class="form-group row">
     <label for="staticEmail" class="col-sm-2 col-form-label">Search for a City: </label>
     <div class="col-sm-10">
       <input type="text" class="form-control" placeholder="for example: Cologne" id="searchbar">
     </div>
   </div>
-  
+
 </div>
 
-<script>
-  function updateTable(items){
-    let headers = ['City', 'Temperature'];
-    let table = document.createElement('table');
-    table.className = 'table table-striped';
-    let thead = document.createElement('thead');
-    thead.className = 'thead-dark';
-    table.appendChild(thead);
-    let headerRow = document.createElement('tr');
-    headers.forEach(headerText => {
-      let header = document.createElement('th');
-      let textNode = document.createTextNode(headerText);
-      header.appendChild(textNode);
-      headerRow.appendChild(header);
-    });
-    thead.appendChild(headerRow);
-
-    let tbody = document.createElement('tbody');
-    for( item of items ) {
-      let row = document.createElement('tr');
-      for( value of Object.values(item) ) {
-        let cell = document.createElement('td');
-        let textNode = document.createTextNode(value);
-        cell.appendChild(textNode);
-        row.appendChild(cell);
-      }
-      tbody.appendChild(row);
-    }
-    table.appendChild(tbody);
-
-    let div = document.getElementById('table');
-    let tables = div.getElementsByTagName('table');
-    for( oldTable of tables ) {
-      oldTable.remove()
-    }
-    div.appendChild(table);
-  }
-
-  fetch('/api/v1/weather')
-  .then(res => res.json())
-  .then(weather => {
-    let items = weather.weather;
-    updateTable(items);
-  });
-
-  let searchbar = document.getElementById('searchbar');
-  searchbar.addEventListener('keypress', () => {
-    console.log(searchbar.value);
-    fetch('/api/v1/weather?city=' + searchbar.value)
-    .then(res => res.json())
-    .then(weather => {
-      let items = weather.weather;
-      updateTable(items);
-    });
-  });
-
-</script>
-
-<!-- Including Bootstrap JS (with its jQuery dependency) so that dynamic components work -->
-<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
 </body>
 </html>
