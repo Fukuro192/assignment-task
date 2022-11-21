@@ -9,12 +9,12 @@ def boilerplate(request):
         {'title': 'Assignment Task'}
     )
 
-def script(request):
-    content = render_to_string('script.js')
+def boilerplate_script(request):
+    content = render_to_string('boilerplate/script.js')
     return HttpResponse(content, 'application/javascript')
 
-def style(request):
-    content = render_to_string('style.css')
+def boilerplate_style(request):
+    content = render_to_string('boilerplate/style.css')
     return HttpResponse(content, 'text/css')
 
 def login(request):
