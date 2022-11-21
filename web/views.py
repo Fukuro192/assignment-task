@@ -16,3 +16,14 @@ def script(request):
 def style(request):
     content = render_to_string('style.css')
     return HttpResponse(content, 'text/css')
+
+def login(request):
+    return render(request, 'login.html')
+
+def login_script(request):
+    content = render_to_string('login/script.js')
+    return HttpResponse(content, 'application/javascript')
+
+def login_style(request):
+    content = render_to_string('login/style.css')
+    return HttpResponse(content, 'text/css')

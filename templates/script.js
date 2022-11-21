@@ -101,7 +101,14 @@ function createTable(items) {
         // making the row clickable
         row.addEventListener('click', () => {
             let value = row.getElementsByClassName("city")[0].innerText;
-            fetch('/api/v1/weather?city=' + value)
+            fetch(
+                '/api/v1/weather?city=' + value,
+                {
+                    headers: {
+                        "Authorization": "Token " + document.getElementById('token').value
+                    }
+                }
+                )
                 .then(res => res.json())
                 .then(weather => {
                     let items = weather.weather;
@@ -123,7 +130,14 @@ function createTable(items) {
     div.appendChild(table);
 }
 
-fetch('/api/v1/weather')
+fetch(
+    '/api/v1/weather',
+    {
+        headers: {
+            "Authorization": "Token " + document.getElementById('token').value
+        }
+    }
+    )
     .then(res => res.json())
     .then(weather => {
         let items = weather.weather;
@@ -133,7 +147,14 @@ fetch('/api/v1/weather')
 let searchbar = document.getElementById('searchbar');
 searchbar.addEventListener('keypress', () => {
     console.log(searchbar.value);
-    fetch('/api/v1/weather?city=' + searchbar.value)
+    fetch(
+        '/api/v1/weather?city=' + searchbar.value,
+        {
+            headers: {
+                "Authorization": "Token " + document.getElementById('token').value
+            }
+        }
+        )
         .then(res => res.json())
         .then(weather => {
             let items = weather.weather;
