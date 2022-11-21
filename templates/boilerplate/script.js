@@ -1,7 +1,7 @@
 // global variable to be used for pagination
 let weather;
 let currentPage = 1;
-let numberOfRows = 5;
+let numberOfRows = 4;
 let tableBody;
 let buttonList = document.getElementById('buttonList');
 
