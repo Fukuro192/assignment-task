@@ -1,11 +1,20 @@
+// global variable to be used for pagination
+let weather;
+let currentPage = 1;
+let numberOfRows = 5;
+let tableBody;
+let buttonList = document.getElementById('buttonList');
+
 function updateContent(items) {
     if (items.length == 0) {
         //render "empty" or "not found" on the table
         createCalloutEmpty();
+        buttonList.innerHTML = "";
     } else if (items.length == 1) {
         //render a weather widget
         let item = items[0];
         createWidget(item);
+        buttonList.innerHTML = "";
     } else {
         // render normal table
         createTable(items);
@@ -65,6 +74,7 @@ function createWidget(item){
 }
 
 function createTable(items) {
+    weather = items;
     let headers = ['City', 'Temperature'];
     let table = document.createElement('table');
     table.className = 'table table-striped table-hover weather-content';
@@ -81,45 +91,11 @@ function createTable(items) {
     thead.appendChild(headerRow);
 
     let tbody = document.createElement('tbody');
-    for (item of items) {
-        // adding city
-        let row = document.createElement('tr');
-        let cell = document.createElement('td');
-        let textNode = document.createTextNode(item['city']);
-        cell.appendChild(textNode);
-        cell.className = "city";
-        row.appendChild(cell);
-
-        // adding temperature
-        // using the same variables: `row`, `cell`, `textNode`
-        cell = document.createElement('td');
-        textNode = document.createTextNode(item['temperature']);
-        cell.appendChild(textNode);
-        cell.className = "temperature";
-        row.appendChild(cell);
-
-        // making the row clickable
-        row.addEventListener('click', () => {
-            let value = row.getElementsByClassName("city")[0].innerText;
-            fetch(
-                '/api/v1/weather?city=' + value,
-                {
-                    headers: {
-                        "Authorization": "Token " + document.getElementById('token').value
-                    }
-                }
-                )
-                .then(res => res.json())
-                .then(weather => {
-                    let items = weather.weather;
-                    updateContent(items);
-                });
-        });
-
-        // adding the row to the table's body
-        tbody.appendChild(row);
-    }
+    tableBody = tbody;
+    displayList(items, tbody, numberOfRows, currentPage);
     table.appendChild(tbody);
+
+    setupPagination(items, buttonList, numberOfRows);
 
     let div = document.getElementById('div-content');
     let weatherContents = div.getElementsByClassName('weather-content');
@@ -130,25 +106,35 @@ function createTable(items) {
     div.appendChild(table);
 }
 
-fetch(
-    '/api/v1/weather',
-    {
-        headers: {
-            "Authorization": "Token " + document.getElementById('token').value
-        }
-    }
-    )
-    .then(res => res.json())
-    .then(weather => {
-        let items = weather.weather;
-        createTable(items);
+function createTableRow(item){
+    // adding city
+    let row = document.createElement('tr');
+    let cell = document.createElement('td');
+    let textNode = document.createTextNode(item['city']);
+    cell.appendChild(textNode);
+    cell.className = "city";
+    row.appendChild(cell);
+
+    // adding temperature
+    // using the same variables: `row`, `cell`, `textNode`
+    cell = document.createElement('td');
+    textNode = document.createTextNode(item['temperature']);
+    cell.appendChild(textNode);
+    cell.className = "temperature";
+    row.appendChild(cell);
+
+    // making the row clickable
+    row.addEventListener('click', () => {
+        let value = row.getElementsByClassName("city")[0].innerText;
+        sendRequest(value);
     });
 
-let searchbar = document.getElementById('searchbar');
-searchbar.addEventListener('keypress', () => {
-    console.log(searchbar.value);
+    return row;
+}
+
+function sendRequest(city) {
     fetch(
-        '/api/v1/weather?city=' + searchbar.value,
+        '/api/v1/weather/?city=' + city,
         {
             headers: {
                 "Authorization": "Token " + document.getElementById('token').value
@@ -159,5 +145,60 @@ searchbar.addEventListener('keypress', () => {
         .then(weather => {
             let items = weather.weather;
             updateContent(items);
-        });
+        });    
+}
+
+sendRequest('');
+
+let searchbar = document.getElementById('searchbar');
+searchbar.addEventListener('keypress', () => {
+    console.log(searchbar.value);
+    sendRequest(searchbar.value);
 });
+
+// pagination functions
+
+function displayList(items, wrapper, rowsPerPage, page) {
+	wrapper.innerHTML = "";
+	page--;
+
+	let start = rowsPerPage * page;
+	let end = start + rowsPerPage;
+	let paginatedItems = items.slice(start, end);
+	for(let i = 0; i < paginatedItems.length; i++) {
+		let item = paginatedItems[i];
+		console.log(item);
+		let row = createTableRow(item);
+
+		wrapper.appendChild(row);
+	}
+
+}
+
+function setupPagination(items, wrapper, rowsPerPage) {
+	wrapper.innerHTML = "";
+	// same concept of floor(), but instead of rounding down, ceil() will round up
+	let pageCount = Math.ceil(items.length/rowsPerPage);
+	for(let i = 1; i<=pageCount; i++){
+		let button = paginationButton(i);
+		wrapper.appendChild(button);
+	}
+}
+
+function paginationButton(pageNumber){
+    let button = document.createElement('li');
+    button.className = "page-item button-" + pageNumber;
+    if(pageNumber == currentPage) button.classList.add('active');
+    let anchor = document.createElement('a');
+    anchor.className = "page-link";
+    anchor.innerText = pageNumber;
+    button.appendChild(anchor);
+    button.addEventListener('click', () => {
+        let previousButton = document.getElementsByClassName('button-' + currentPage)[0];
+        previousButton.className = "page-item button-"+currentPage;
+        currentPage = pageNumber;
+        displayList(weather, tableBody, numberOfRows, pageNumber);
+        let currentButton = document.getElementsByClassName('button-' + currentPage)[0].classList.add('active');
+    });
+    return button;
+}
