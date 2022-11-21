@@ -4,17 +4,18 @@ let currentPage = 1;
 let numberOfRows = 4;
 let tableBody;
 let buttonList = document.getElementById('buttonList');
+let maxPages;
 
 function updateContent(items) {
     if (items.length == 0) {
         //render "empty" or "not found" on the table
         createCalloutEmpty();
-        buttonList.innerHTML = "";
+        wrapper.style.display = 'none';
     } else if (items.length == 1) {
         //render a weather widget
         let item = items[0];
         createWidget(item);
-        buttonList.innerHTML = "";
+        wrapper.style.display = 'none';
     } else {
         // render normal table
         createTable(items);
@@ -75,6 +76,7 @@ function createWidget(item){
 
 function createTable(items) {
     weather = items;
+    currentPage = 1;
     let headers = ['City', 'Temperature'];
     let table = document.createElement('table');
     table.className = 'table table-striped table-hover weather-content';
@@ -176,29 +178,39 @@ function displayList(items, wrapper, rowsPerPage, page) {
 }
 
 function setupPagination(items, wrapper, rowsPerPage) {
-	wrapper.innerHTML = "";
+    wrapper.style.display = 'flex';
 	// same concept of floor(), but instead of rounding down, ceil() will round up
-	let pageCount = Math.ceil(items.length/rowsPerPage);
-	for(let i = 1; i<=pageCount; i++){
-		let button = paginationButton(i);
-		wrapper.appendChild(button);
+	maxPages = Math.ceil(items.length/rowsPerPage);
+	for(let buttonString of ['button-previous', 'button-next']){
+		paginationButton(buttonString);
 	}
 }
 
-function paginationButton(pageNumber){
-    let button = document.createElement('li');
-    button.className = "page-item button-" + pageNumber;
-    if(pageNumber == currentPage) button.classList.add('active');
-    let anchor = document.createElement('a');
-    anchor.className = "page-link";
-    anchor.innerText = pageNumber;
-    button.appendChild(anchor);
-    button.addEventListener('click', () => {
-        let previousButton = document.getElementsByClassName('button-' + currentPage)[0];
-        previousButton.className = "page-item button-"+currentPage;
-        currentPage = pageNumber;
-        displayList(weather, tableBody, numberOfRows, pageNumber);
-        let currentButton = document.getElementsByClassName('button-' + currentPage)[0].classList.add('active');
-    });
-    return button;
+function paginationButton(buttonString){
+    let button = document.getElementById(buttonString);
+    button.className = "page-item";
+    if(buttonString == 'button-previous') button.classList.add('disabled');
+    if(maxPages == 1 && buttonString == 'button-next') button.classList.add('disabled');
+    button.addEventListener('click', pressButton);
+}
+
+function pressButton() {
+    if(this.className.includes('disabled')) return;
+    if(this.id == 'button-previous'){
+        currentPage--;
+    }else{
+        currentPage++;
+    }
+    displayList(weather, tableBody, numberOfRows, currentPage); 
+    if(currentPage > 1 && currentPage < maxPages){
+        for(let button of buttonList.getElementsByTagName('li')){
+            button.className = "page-item";
+        }
+    }
+    if (currentPage == 1){
+        document.getElementById('button-previous').classList.add('disabled');
+    }
+    if (currentPage == maxPages){
+        document.getElementById('button-next').classList.add('disabled');
+    }
 }
