@@ -119,7 +119,7 @@ function sendRequest(city) {
 sendRequest('');
 
 let searchbar = $('#searchbar');
-$('#searchbar').keypress(() => {
+$('#searchbar').on('input', () => {
     console.log($('#searchbar').val());
     sendRequest($('#searchbar').val());
 });
