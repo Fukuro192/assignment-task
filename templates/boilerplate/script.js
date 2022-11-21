@@ -3,19 +3,19 @@ let weather;
 let currentPage = 1;
 let numberOfRows = 4;
 let tableBody;
-let buttonList = document.getElementById('buttonList');
+let buttonList = $('#buttonList');
 let maxPages;
 
 function updateContent(items) {
     if (items.length == 0) {
         //render "empty" or "not found" on the table
         createCalloutEmpty();
-        wrapper.style.display = 'none';
+        $('#buttonList').hide();
     } else if (items.length == 1) {
         //render a weather widget
         let item = items[0];
         createWidget(item);
-        wrapper.style.display = 'none';
+        $('#buttonList').hide();
     } else {
         // render normal table
         createTable(items);
@@ -23,111 +23,77 @@ function updateContent(items) {
 }
 
 function createCalloutEmpty(){
-    let divCallout = document.createElement('div');
-    divCallout.className = "callout-info border-left-color weather-content";
-    let pText = document.createElement('p');
-    pText.textContent = "no city was found";
-    divCallout.appendChild(pText);
-    
-    let div = document.getElementById('div-content');
-    let weatherContents = div.getElementsByClassName('weather-content');
-    for (weatherContent of weatherContents) {
-        weatherContent.remove();
-    }
-    
-    div.appendChild(divCallout);
+    let divCallout = $('<div>', {class: "callout-info border-left-color weather-content"});
+    divCallout.append($('<p>no city was found</p>'));
+    $('.weather-content').remove();
+    $('#div-content').append(divCallout);
 }
 
 function createWidget(item){
-    let icon = document.createElement('i');
-    if(item.temperature < 10) icon.className = "bi bi-cloud-snow";
-    else if (item.temperature >= 10 && item.temperature < 20) icon.className = "bi bi-cloud-sun-fill";
-    else icon.className = "bi bi-sun-fill";
-    icon.className = icon.className + " fs-custom-1";
-    let iconDiv = document.createElement('div');
-    iconDiv.className = "col-sm-4 text-warning";
-    iconDiv.appendChild(icon);
-    let temperatureDiv = document.createElement('div');
-    temperatureDiv.className = "row fs-custom-2";
-    temperatureDiv.textContent = item.temperature + "°C";
-    let cityDiv = document.createElement('div');
-    cityDiv.className = "row fs-custom-3 text-muted";
-    cityDiv.textContent = item.city;
-    let dataDiv = document.createElement('div');
-    dataDiv.className = "col-sm-6 offset-sm-1";
-    dataDiv.appendChild(temperatureDiv);
-    dataDiv.appendChild(cityDiv);
-    let rowDiv = document.createElement('div');
-    rowDiv.className = "row";
-    rowDiv.appendChild(dataDiv);
-    rowDiv.appendChild(iconDiv);
-    let widgetDiv = document.createElement('div');
-    widgetDiv.className = "media row bg-info bg-gradient rounded-5 weather-content";
-    widgetDiv.appendChild(rowDiv);
-
-    let div = document.getElementById('div-content');
-    let weatherContents = div.getElementsByClassName('weather-content');
-    for (weatherContent of weatherContents) {
-        weatherContent.remove();
-    }
-    
-    div.appendChild(widgetDiv);
+    let icon = $('<i>');
+    if(item.temperature < 10) icon.attr('class', "bi bi-cloud-snow");
+    else if (item.temperature >= 10 && item.temperature < 20) icon.attr('class', "bi bi-cloud-sun-fill");
+    else icon.attr('class', "bi bi-sun-fill");
+    icon.addClass(" fs-custom-1");
+    $('.weather-content').remove();    
+    $('#div-content').append(
+        $('<div>', {class: "media row bg-info bg-gradient rounded-5 weather-content"})
+        .append($('<div>', {class: "row"})
+        .append(
+            $('<div>', {class: "col-sm-6 offset-sm-1"})
+            .append(
+                $('<div>', {class: "row fs-custom-2"})
+                .text(item.temperature + "°C")
+            )
+            .append(
+                $('<div>', {class: "row fs-custom-3 text-muted"})
+                .text(item.city)
+            )
+        )
+        .append(
+            $('<div>', {class: "col-sm-4 text-warning"})
+            .append(icon)
+        ))
+    );
 }
 
 function createTable(items) {
     weather = items;
     currentPage = 1;
     let headers = ['City', 'Temperature'];
-    let table = document.createElement('table');
-    table.className = 'table table-striped table-hover weather-content';
-    let thead = document.createElement('thead');
-    thead.className = 'table-dark';
-    table.appendChild(thead);
-    let headerRow = document.createElement('tr');
+    let table = $('<table>', {class: 'table table-striped table-hover weather-content'});
+    let thead = $('<thead>', {class: 'table-dark'});
+    table.append(thead);
+    let headerRow = $('<tr>');
     headers.forEach(headerText => {
-        let header = document.createElement('th');
-        let textNode = document.createTextNode(headerText);
-        header.appendChild(textNode);
-        headerRow.appendChild(header);
+        headerRow.append($('<th>').text(headerText));
     });
-    thead.appendChild(headerRow);
+    thead.append(headerRow);
 
-    let tbody = document.createElement('tbody');
+    let tbody = $('<tbody>');
     tableBody = tbody;
     displayList(items, tbody, numberOfRows, currentPage);
-    table.appendChild(tbody);
+    table.append(tbody);
 
     setupPagination(items, buttonList, numberOfRows);
 
-    let div = document.getElementById('div-content');
-    let weatherContents = div.getElementsByClassName('weather-content');
-    for (weatherContent of weatherContents) {
-        weatherContent.remove();
-    }
+    $('.weather-content').remove();
     
-    div.appendChild(table);
+    $('#div-content').append(table);
 }
 
 function createTableRow(item){
     // adding city
-    let row = document.createElement('tr');
-    let cell = document.createElement('td');
-    let textNode = document.createTextNode(item['city']);
-    cell.appendChild(textNode);
-    cell.className = "city";
-    row.appendChild(cell);
+    let row = $('<tr>');
+    row.append($('<td>', {class: 'city'}).text(item['city']));
 
     // adding temperature
     // using the same variables: `row`, `cell`, `textNode`
-    cell = document.createElement('td');
-    textNode = document.createTextNode(item['temperature']);
-    cell.appendChild(textNode);
-    cell.className = "temperature";
-    row.appendChild(cell);
+    row.append($('<td>', {class: 'temperature'}).text(item['temperature']));
 
     // making the row clickable
-    row.addEventListener('click', () => {
-        let value = row.getElementsByClassName("city")[0].innerText;
+    row.click(() => {
+        let value = $(".city:eq(0)").text();
         sendRequest(value);
     });
 
@@ -152,16 +118,16 @@ function sendRequest(city) {
 
 sendRequest('');
 
-let searchbar = document.getElementById('searchbar');
-searchbar.addEventListener('keypress', () => {
-    console.log(searchbar.value);
-    sendRequest(searchbar.value);
+let searchbar = $('#searchbar');
+$('#searchbar').keypress(() => {
+    console.log($('#searchbar').val());
+    sendRequest($('#searchbar').val());
 });
 
 // pagination functions
 
 function displayList(items, wrapper, rowsPerPage, page) {
-	wrapper.innerHTML = "";
+	wrapper.empty();
 	page--;
 
 	let start = rowsPerPage * page;
@@ -172,13 +138,13 @@ function displayList(items, wrapper, rowsPerPage, page) {
 		console.log(item);
 		let row = createTableRow(item);
 
-		wrapper.appendChild(row);
+		wrapper.append(row);
 	}
 
 }
 
 function setupPagination(items, wrapper, rowsPerPage) {
-    wrapper.style.display = 'flex';
+    wrapper.show();
 	// same concept of floor(), but instead of rounding down, ceil() will round up
 	maxPages = Math.ceil(items.length/rowsPerPage);
 	for(let buttonString of ['button-previous', 'button-next']){
@@ -187,30 +153,28 @@ function setupPagination(items, wrapper, rowsPerPage) {
 }
 
 function paginationButton(buttonString){
-    let button = document.getElementById(buttonString);
-    button.className = "page-item";
-    if(buttonString == 'button-previous') button.classList.add('disabled');
-    if(maxPages == 1 && buttonString == 'button-next') button.classList.add('disabled');
-    button.addEventListener('click', pressButton);
+    let button = $('#' + buttonString).attr('class', 'page-item');
+    console.log(button.html());
+    if(buttonString == 'button-previous') button.addClass('disabled');
+    if(maxPages == 1 && buttonString == 'button-next') button.addClass('disabled');
+    button.click(pressButton);
 }
 
 function pressButton() {
-    if(this.className.includes('disabled')) return;
-    if(this.id == 'button-previous'){
+    if($(this).attr('class').includes('disabled')) return;
+    if($(this).attr('id') == 'button-previous'){
         currentPage--;
     }else{
         currentPage++;
     }
     displayList(weather, tableBody, numberOfRows, currentPage); 
     if(currentPage > 1 && currentPage < maxPages){
-        for(let button of buttonList.getElementsByTagName('li')){
-            button.className = "page-item";
-        }
+        $('li').attr('class', 'page-item');
     }
     if (currentPage == 1){
-        document.getElementById('button-previous').classList.add('disabled');
+        $('#button-previous').addClass('disabled');
     }
     if (currentPage == maxPages){
-        document.getElementById('button-next').classList.add('disabled');
+        $('#button-next').addClass('disabled')
     }
 }
