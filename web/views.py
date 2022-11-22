@@ -9,6 +9,10 @@ def boilerplate(request):
         {'title': 'Assignment Task'}
     )
 
+def boilerplate_jquery(request):
+    content = render_to_string('boilerplate/jquery-3.6.1.min.js')
+    return HttpResponse(content, 'application/javascript')
+
 def boilerplate_script(request):
     content = render_to_string('boilerplate/script.js')
     return HttpResponse(content, 'application/javascript')
