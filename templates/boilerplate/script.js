@@ -7,7 +7,7 @@ let buttonList = $('#buttonList');
 let maxPages;
 
 function updateContent(items) {
-    if (items.length == 0) {
+    if (!items || items.length == 0) {
         //render "empty" or "not found" on the table
         createCalloutEmpty();
         $('#buttonList').hide();
@@ -119,7 +119,7 @@ function sendRequest(city) {
 sendRequest('');
 
 let searchbar = $('#searchbar');
-$('#searchbar').on('input', () => {
+$('#searchbar').on('input keypress', () => {
     console.log($('#searchbar').val());
     sendRequest($('#searchbar').val());
 });
