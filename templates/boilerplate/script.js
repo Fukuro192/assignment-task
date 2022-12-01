@@ -34,7 +34,7 @@ function createWidget(item){
     if(item.temperature < 10) icon.attr('class', "bi bi-cloud-snow");
     else if (item.temperature >= 10 && item.temperature < 20) icon.attr('class', "bi bi-cloud-sun-fill");
     else icon.attr('class', "bi bi-sun-fill");
-    icon.addClass(" fs-custom-1");
+    icon.addClass("fs-custom-1");
     $('.weather-content').remove();    
     $('#div-content').append(
         $('<div>', {class: "media row bg-info bg-gradient rounded-5 weather-content"})
@@ -85,16 +85,17 @@ function createTable(items) {
 function createTableRow(item){
     // adding city
     let row = $('<tr>');
-    row.append($('<td>', {class: 'city'}).text(item['city']));
+    let cityName = item['city'];
+    let temperatureValue = item['temperature'];
+    row.append($('<td>', {class: 'city'}).text(cityName));
 
     // adding temperature
     // using the same variables: `row`, `cell`, `textNode`
-    row.append($('<td>', {class: 'temperature'}).text(item['temperature']));
+    row.append($('<td>', {class: 'temperature'}).text(temperatureValue));
 
     // making the row clickable
     row.click(() => {
-        let value = $(".city:eq(0)").text();
-        sendRequest(value);
+        sendRequest(cityName);
     });
 
     return row;
@@ -157,6 +158,7 @@ function paginationButton(buttonString){
     console.log(button.html());
     if(buttonString == 'button-previous') button.addClass('disabled');
     if(maxPages == 1 && buttonString == 'button-next') button.addClass('disabled');
+    button.off("click");
     button.click(pressButton);
 }
 
@@ -171,10 +173,8 @@ function pressButton() {
     if(currentPage > 1 && currentPage < maxPages){
         $('li').attr('class', 'page-item');
     }
-    if (currentPage == 1){
-        $('#button-previous').addClass('disabled');
-    }
-    if (currentPage == maxPages){
-        $('#button-next').addClass('disabled')
-    }
+    if (currentPage == 1) $('#button-previous').addClass('disabled');
+    else $('#button-previous').removeClass('disabled');
+    if (currentPage == maxPages) $('#button-next').addClass('disabled');
+    else $('#button-next').removeClass('disabled');
 }
